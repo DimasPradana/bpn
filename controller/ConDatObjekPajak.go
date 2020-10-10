@@ -82,7 +82,7 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 		TODO snub on Sel 06 Okt 2020 09:37:02  : insert ke database di function ini
 		- jika nomor akta sudah ada maka tidak bisa di insert v
 		- usahakan nomer harus urut v
-		- belum bisa parsing dari nama wp yg ada karakter ' nya
+		- belum bisa parsing dari nama wp yg ada karakter ' nya contoh di tanggal 06/05/2020 belum masuk semua
 	*/
 
 	var vNopSertifikatID *uint64
