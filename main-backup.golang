@@ -1,0 +1,54 @@
+package main-backup
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+)
+
+func main() {
+	/*
+	TODO snub on Sel 23 Jun 2020 08:19:45
+	- alamatHost: http://103.49.37.84:8080/BPNApiService/Api/BPHTB/getDataBPN
+	- json body : USERNAME, PASSWORD, TANGGAL
+	- response body:
+	- AKTAID
+	- TGL_AKTA
+	- NOP
+	- NIB
+	- NIK
+	- NPWP
+	- NAMA_WP
+	- ALAMAT_OP
+	- KELURAHAN_OP
+	- KECAMATAN_OP
+	- KOTA_OP
+	- LUASTANAH_OP
+	- LUASBANGUNAN_OP
+	- PPAT
+	- NO_SERTIPIKAT
+	- NO_AKTA
+	*/
+	alamatHost := "http://103.49.37.84:8080/BPNApiService/Api/BPHTB/getDataBPN"
+	// alamatHostGet := "https://httpbin.org/json"
+	// alamatHostPost := "https://httpbin.org/post"
+	// response, err := http.Get(alamatHostGet)
+	// if err != nil {
+	// 	fmt.Printf("Http request failed on line 33: %v\n", err)
+	// }else {
+	// 	data, _ := ioutil.ReadAll(response.Body)
+	// 	fmt.Println(string(data))
+	// }
+
+	jsonData := map[string]string{"USERNAME":"bapendakabsitubondo", "PASSWORD":"b3kn4s4p4", "TANGGAL":"16/06/2020"}
+	jsonValue, _ := json.Marshal(jsonData)
+	response, err := http.Post(alamatHost, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		fmt.Printf("Http request failed on line 49: %v\n", err)
+	}else {
+		data, _ := ioutil.ReadAll(response.Body)
+		fmt.Println(string(data))
+	}
+}
