@@ -10,6 +10,7 @@ import (
 	"kantor/bpn/model"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
@@ -87,6 +88,10 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 
 	var vNopSertifikatID *uint64
 	var vNomorUrut uint64
+
+	NamaPPAT = strings.ReplaceAll(NamaPPAT, "'", "`")
+	NamaWP = strings.ReplaceAll(NamaWP, "'", "`")
+
 	fmt.Printf("NIB: %+v, NOP: %+v, LuasTanah: %+v, NTPD: %+v\n", NomorIndukBidang, NOP, LuasTanahOP, NTPD)
 
 	/*
@@ -129,7 +134,7 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 		if err != nil {
 			log.Fatalf("errornya di baris 129: %v\n", err.Error())
 		} else {
-			log.Infof("Sukses di baris 131: %v", hasilGetNomorUrut)
+			// log.Infof("Sukses di baris 131: %v", hasilGetNomorUrut)
 			for hasilGetNomorUrut.Next() {
 				if err := hasilGetNomorUrut.Scan(&vNomorUrut); err != nil {
 					log.Infof("errornya di baris 134: %v", err.Error())
@@ -142,13 +147,13 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 			" nomor_akta, tanggal_akta, nama_ppat, nop, ntpd, nomor_induk_bidang, "+
 			" koordinat_x, koordinat_y, nik, npwp, nama_wp, kelurahan_op, kecamatan_op, "+
 			" kota_op, luastanah_op, jenis_hak, tanggal_get) values (%v, "+
-			" `%s`, `%s`, `%s`, `%s`, `%s`, `%s`, "+
-			" `%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`, "+
-			" `%s`, %v, `%s`, `%s` )", vNomorUrut, NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
+			" '%s', '%s', '%s', '%s', '%s', '%s', "+
+			" '%s', '%s', '%s', '%s', '%s', '%s', '%s', "+
+			" '%s', %v, '%s', '%s' )", vNomorUrut, NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
 			NamaWP, KelurahanOP, KecamatanOP, KotaOP, LuasTanahOP, JenisHak, TanggalGet)
 		hasilDoInsert, err := kon.Exec(doInsert)
 		if err != nil {
-			log.Fatalf("errornya di baris 150: %v\n", err.Error())
+			log.Fatalf("errornya di baris 150: %v\nQuery: %v", err.Error(), doInsert)
 		} else {
 			log.Infof("Insert Sukses (%v)", hasilDoInsert)
 		}
