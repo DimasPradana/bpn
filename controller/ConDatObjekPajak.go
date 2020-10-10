@@ -1,6 +1,5 @@
 package controller
 
-// {{{ import
 import (
 	"bytes"
 	"encoding/json"
@@ -15,9 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// }}}
-
-// {{{ GetSingleDOP
 func GetSingleDOP() {
 	// ambil dari env
 	err := godotenv.Load()
@@ -26,14 +22,12 @@ func GetSingleDOP() {
 	}
 	EnvUsername := os.Getenv("nama")
 	EnvPassword := os.Getenv("password")
+	alamatHost := os.Getenv("alamathost")
 
 	// kasih flag untuk filter tanggal transaksi
 	flagTanggalTransaksi := flag.String("tgl", "17/06/2020",
 		"input tanggal transaksi AKTA")
 	flag.Parse()
-
-	// alamat server
-	alamatHost := "https://services.atrbpn.go.id/BPNApiService/Api/BPHTB/getDataATRBPN"
 
 	// tampung struct request dari model
 	jsonDataReq := model.StructReqSingleDOP{USERNAME: EnvUsername,
@@ -81,15 +75,27 @@ func GetSingleDOP() {
 	}
 }
 
-// }}}
-
-// {{{ InsertDataBPN
 func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
 	NamaWP, KelurahanOP, KecamatanOP, KotaOP, JenisHak string, LuasTanahOP float32) {
 	/*
 		TODO snub on Sel 06 Okt 2020 09:37:02  : insert ke database di function ini
 	*/
 	fmt.Printf("NIB: %+v, NOP: %+v, LuasTanah: %+v, NTPD: %+v\n", NomorIndukBidang, NOP, LuasTanahOP, NTPD)
-}
 
-// }}}
+	/*
+		TODO snub on Sab 04 Jul 2020 11:11:28  : ambil config dari env file
+	*/
+
+	// ambil dari env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	envUser := os.Getenv("userpbb")
+	envPass := os.Getenv("passwordpbb")
+	envAddr := os.Getenv("addressserverpbb")
+	envPort := os.Getenv("portserverpbb")
+	envSN := os.Getenv("servicenamepbb")
+
+	log.Infof("userpbb: %v, passPBB: %v, addrPBB: %v, portPBB: %v, serviceNamePBB: %v", envUser, envPass, envAddr, envPort, envSN)
+}
