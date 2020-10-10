@@ -1,6 +1,5 @@
 package model
 
-// {{{ StructResSingleDOP
 type StructResSingleDOP struct {
 	NOMOR_AKTA         string  `json:"nomor_akta"`
 	TANGGAL_AKTA       string  `json:"tanggal_akta"`
@@ -20,21 +19,13 @@ type StructResSingleDOP struct {
 	JENIS_HAK          string  `json:"jenis_hak"`
 }
 
-// }}}
-
-// {{{ StructReqSingleDOP
 type StructReqSingleDOP struct {
 	USERNAME string `json:"username"`
 	PASSWORD string `json:"password"`
 	TANGGAL  string `json:"tanggal"`
 }
 
-// }}}
-
-// {{{ StructResSingleDOP2
 type StructResSingleDOP2 struct {
 	Result      []StructResSingleDOP `json:"result"`
 	Respon_code string               `json:"respon_code"`
 }
-
-// }}}

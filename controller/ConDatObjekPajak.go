@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"kantor/bpn/database"
 	"kantor/bpn/model"
 	"net/http"
 	"os"
@@ -68,7 +69,7 @@ func GetSingleDOP() {
 						jsonDataRes.Result[i].NIK, jsonDataRes.Result[i].NPWP,
 						jsonDataRes.Result[i].NAMA_WP, jsonDataRes.Result[i].KELURAHAN_OP,
 						jsonDataRes.Result[i].KECAMATAN_OP, jsonDataRes.Result[i].KOTA_OP,
-						jsonDataRes.Result[i].JENIS_HAK, jsonDataRes.Result[i].LUASTANAH_OP)
+						jsonDataRes.Result[i].JENIS_HAK, *flagTanggalTransaksi, jsonDataRes.Result[i].LUASTANAH_OP)
 				}
 			}
 		}
@@ -76,17 +77,20 @@ func GetSingleDOP() {
 }
 
 func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
-	NamaWP, KelurahanOP, KecamatanOP, KotaOP, JenisHak string, LuasTanahOP float32) {
+	NamaWP, KelurahanOP, KecamatanOP, KotaOP, JenisHak, TanggalGet string, LuasTanahOP float32) {
 	/*
 		TODO snub on Sel 06 Okt 2020 09:37:02  : insert ke database di function ini
+		- jika nomor akta sudah ada maka tidak bisa di insert
+		- usahakan nomer harus urut
 	*/
+
+	var vNopSertifikatID *uint64
+	var vNomorUrut uint64
 	fmt.Printf("NIB: %+v, NOP: %+v, LuasTanah: %+v, NTPD: %+v\n", NomorIndukBidang, NOP, LuasTanahOP, NTPD)
 
 	/*
 		TODO snub on Sab 04 Jul 2020 11:11:28  : ambil config dari env file
 	*/
-
-	// ambil dari env
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -97,5 +101,59 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 	envPort := os.Getenv("portserverpbb")
 	envSN := os.Getenv("servicenamepbb")
 
-	log.Infof("userpbb: %v, passPBB: %v, addrPBB: %v, portPBB: %v, serviceNamePBB: %v", envUser, envPass, envAddr, envPort, envSN)
+	// log.Infof("userpbb: %v, passPBB: %v, addrPBB: %v, portPBB: %v, serviceNamePBB: %v", envUser, envPass, envAddr, envPort, envSN)
+
+	kon, _ := database.KonekOracle(envUser, envPass, envAddr, envPort, envSN)
+
+	getCounterNIB := fmt.Sprintf("select count(nop_sertifikat_id) from nop_sertifikat "+
+		" where nomor_akta = '%s' and nomor_induk_bidang = '%s'", NomorAkta, NomorIndukBidang)
+	hasilGetCounterNIB, err := kon.Query(getCounterNIB)
+	if err != nil {
+		log.Fatalf("errornya di baris 112: %v\n", err.Error())
+	} else {
+		// log.Infof("Sukses di baris 111: %v", hasilGetCounterNIB)
+		for hasilGetCounterNIB.Next() {
+			if err := hasilGetCounterNIB.Scan(&vNopSertifikatID); err != nil {
+				log.Infof("errornya di baris 117: %v", err.Error())
+			} /*else {
+				log.Infof("sukses baris 118: %v", *vNopSertifikatID)
+			}*/
+		}
+	}
+
+	if *vNopSertifikatID == 0 {
+		log.Infof("nomor akta atau nomor induk bidang belum ada")
+
+		hasilGetNomorUrut, err := kon.Query("select ns.nop_sertifikat_id from nop_sertifikat ns where rownum = 1 order by ns.nop_sertifikat_id desc")
+		if err != nil {
+			log.Fatalf("errornya di baris 129: %v\n", err.Error())
+		} else {
+			log.Infof("Sukses di baris 131: %v", hasilGetNomorUrut)
+			for hasilGetNomorUrut.Next() {
+				if err := hasilGetNomorUrut.Scan(&vNomorUrut); err != nil {
+					log.Infof("errornya di baris 134: %v", err.Error())
+				}
+				vNomorUrut = vNomorUrut + 1
+			}
+		}
+		log.Infof("Nop sertifikat = %v, nomor urut = %v", *vNopSertifikatID, vNomorUrut)
+		doInsert := fmt.Sprintf("insert into nop_sertifikat(nop_sertifikat_id, "+
+			" nomor_akta, tanggal_akta, nama_ppat, nop, ntpd, nomor_induk_bidang, "+
+			" koordinat_x, koordinat_y, nik, npwp, nama_wp, kelurahan_op, kecamatan_op, "+
+			" kota_op, luastanah_op, jenis_hak, tanggal_get) values (%v, "+
+			" '%s', '%s', '%s', '%s', '%s', '%s', "+
+			" '%s', '%s', '%s', '%s', '%s', '%s', '%s', "+
+			" '%s', %v, '%s', '%s' )", vNomorUrut, NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
+			NamaWP, KelurahanOP, KecamatanOP, KotaOP, LuasTanahOP, JenisHak, TanggalGet)
+		hasilDoInsert, err := kon.Exec(doInsert)
+		if err != nil {
+			log.Fatalf("errornya di baris 150: %v\n", err.Error())
+		} else {
+			log.Infof("Insert Sukses (%v)", hasilDoInsert)
+		}
+	} else {
+		log.Infof("nomor akta atau nomor induk bidang sudah ada")
+	}
+
+	defer kon.Close()
 }
