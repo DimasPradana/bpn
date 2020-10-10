@@ -80,8 +80,9 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 	NamaWP, KelurahanOP, KecamatanOP, KotaOP, JenisHak, TanggalGet string, LuasTanahOP float32) {
 	/*
 		TODO snub on Sel 06 Okt 2020 09:37:02  : insert ke database di function ini
-		- jika nomor akta sudah ada maka tidak bisa di insert
-		- usahakan nomer harus urut
+		- jika nomor akta sudah ada maka tidak bisa di insert v
+		- usahakan nomer harus urut v
+		- belum bisa parsing dari nama wp yg ada karakter ' nya
 	*/
 
 	var vNopSertifikatID *uint64
@@ -141,9 +142,9 @@ func InsertDataBPN(NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang
 			" nomor_akta, tanggal_akta, nama_ppat, nop, ntpd, nomor_induk_bidang, "+
 			" koordinat_x, koordinat_y, nik, npwp, nama_wp, kelurahan_op, kecamatan_op, "+
 			" kota_op, luastanah_op, jenis_hak, tanggal_get) values (%v, "+
-			" '%s', '%s', '%s', '%s', '%s', '%s', "+
-			" '%s', '%s', '%s', '%s', '%s', '%s', '%s', "+
-			" '%s', %v, '%s', '%s' )", vNomorUrut, NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
+			" `%s`, `%s`, `%s`, `%s`, `%s`, `%s`, "+
+			" `%s`, `%s`, `%s`, `%s`, `%s`, `%s`, `%s`, "+
+			" `%s`, %v, `%s`, `%s` )", vNomorUrut, NomorAkta, TanggalAkta, NamaPPAT, NOP, NTPD, NomorIndukBidang, KoordinatX, KoordinatY, NIK, NPWP,
 			NamaWP, KelurahanOP, KecamatanOP, KotaOP, LuasTanahOP, JenisHak, TanggalGet)
 		hasilDoInsert, err := kon.Exec(doInsert)
 		if err != nil {
