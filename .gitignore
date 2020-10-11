@@ -2,3 +2,4 @@
 .idea
 *.org
 *.backup
+*.sum
