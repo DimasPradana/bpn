@@ -1,9 +1,9 @@
 package main
 
 import (
-	"kantor/bpn/controller"
+	"github.com/DimasPradana/skripsi/bpn-go/controller"
 )
 
 func main() {
-	controller.GetSingleDOP()
+	controller.AmbilNOP()
 }
