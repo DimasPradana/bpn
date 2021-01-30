@@ -12,10 +12,9 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	// "skripsi/bpn-go/database"
 	"net/http"
 	"os"
-	"github.com/DimasPradana/skripsi/bpn-go/model"
+	"bpn-go/model"
 	// "strings"
 	"time"
 
